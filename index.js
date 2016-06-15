@@ -1,13 +1,17 @@
 var fs = require('fs');
 var http = require('http');
 var https = require('https');
-var keyfile = process.env.KEY_FILE;
-var crtfile = process.env.CRT_FILE;
 
-var privateKey = fs.readFileSync(keyfile, 'utf8');
-var certificate = fs.readFileSync(crtfile, 'utf8');
+if(process.env.ENVIRONMENT === 'production') {
+	var keyfile = process.env.KEY_FILE;
+	var crtfile = process.env.CRT_FILE;
 
-var credentials = {key: privateKey, cert: certificate};
+	var privateKey = fs.readFileSync(keyfile, 'utf8');
+	var certificate = fs.readFileSync(crtfile, 'utf8');
+
+	var credentials = {key: privateKey, cert: certificate};
+
+};
 
 var express = require('express');
 var app = express();
@@ -22,7 +26,9 @@ app.get('/', function(req, res) {
 });
 
 var httpServer = http.createServer(app);
-var httpsServer = https.createServer(credentials, app);
-
 httpServer.listen(port);
-httpsServer.listen(443);
+
+if(process.env.ENVIRONMENT === 'production') {
+	var httpsServer = https.createServer(credentials, app);
+	httpsServer.listen(443);
+};
