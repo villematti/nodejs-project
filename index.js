@@ -31,6 +31,11 @@ app.use('/assets', express.static(__dirname + '/public'));
 app.use(cors());
 app.use(errorhandler());
 
+var authCheck = jwt({
+	secret: new Buffer(process.env.AUTH_SECRET, 'base64'),
+	audience: process.env.AUTH_PUBLIC
+});
+
 app.get('/', function(req, res) {
 	res.render('index');
 });
